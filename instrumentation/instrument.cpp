@@ -8,6 +8,9 @@
  * such as -DFOO to define FOO.
  *
  * Generated as output <file>_out.c
+ * 
+ * Original code: https://github.com/loarabia/Clang-tutorial/
+ * Modified by: Ankit Goyal
  *
  *****************************************************************************/
 
