@@ -4,7 +4,7 @@
 int doit(int a){
     int b;
     int c[10];
-
+    
     printf("hello!");
 }
 

@@ -6,19 +6,17 @@
 
 int doit(int a){
     int b;
-    printme(&b);
-    
     int c[10];
-    printme(&c);
+    printf("varinfo:c:10:%08lx",(void *) &c);
     
-
+    
     printf("hello!");
 }
 
 int main(void){
 
     int a[20];
-    printme(&a);
+    printf("varinfo:a:20:%08lx",(void *) &a);
     
     doit();
     return 0;

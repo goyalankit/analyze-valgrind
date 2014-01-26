@@ -58,29 +58,37 @@ class MyRecursiveASTVisitor
         Rewriter &Rewrite;
 };
 
+
+std::string printMethodName(std::string variable_name, const int size){
+    std::stringstream method_name;
+    method_name << "\nprintf(\"varinfo:" << variable_name << ":"<< size << ":\%08lx\"," << "(void *) &" << variable_name << ");\n";
+    return method_name.str();
+}
+
 void MyRecursiveASTVisitor::InstrumentDeclStmt(DeclStmt *s)
 {
-
     for (clang::DeclStmt::const_decl_iterator DI = s->decl_begin(), DE = s->decl_end(); DI != DE; ++DI) {
         const VarDecl *V = cast<VarDecl>(*DI);
         std::string variable_name = V->getNameAsString();
+        llvm::errs() << "Variable: " << variable_name << "Type: " << QualType::getAsString(V->getType().split()) << "\n";
 
-        SourceLocation END = V->getLocEnd();
-
-        //    llvm::errs() << s->getLocStart();
-        // MeasureTokenLength gets us past the last token, and adding 1 gets
-        // us past the ';'.
-        int offset = Lexer::MeasureTokenLength(END,
-                Rewrite.getSourceMgr(),
-                Rewrite.getLangOpts()) + 1;
-
-        SourceLocation END1 = END.getLocWithOffset(offset);
-        std::stringstream method_name;
-        method_name << "\nprintme(&" << variable_name << ");\n";
-
-        Rewrite.InsertText(END1, method_name.str(), true, true);
+        if(V->getType()->isArrayType()){
+            SourceLocation END = V->getLocEnd();
+            //    llvm::errs() << s->getLocStart();
+            // MeasureTokenLength gets us past the last token, and adding 1 gets
+            // us past the ';'.
+            int offset = Lexer::MeasureTokenLength(END,
+                    Rewrite.getSourceMgr(),
+                    Rewrite.getLangOpts()) + 1;
+            const ArrayType* const arrayType = V->getType()->getAsArrayTypeUnsafe();
+            const ConstantArrayType* const constArrayType = dyn_cast<ConstantArrayType>(arrayType);
+            const int size = int(constArrayType->getSize().roundToDouble());
+            SourceLocation END1 = END.getLocWithOffset(offset);
+            Rewrite.InsertText(END1, printMethodName(variable_name,size), true, true);
+        }
     }
 }
+
 
 
 // Override Statements which includes expressions and more
