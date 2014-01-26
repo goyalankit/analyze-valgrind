@@ -11,6 +11,6 @@ int doit(int a){
 int main(void){
 
     int a[20];
-    doit();
+    doit(12);
     return 0;
 }

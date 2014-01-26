@@ -7,8 +7,7 @@
 int doit(int a){
     int b;
     int c[10];
-    printf("varinfo:c:10:%08lx",(void *) &c);
-    
+    printf("varinfo:c:10:%08lx\n",(void *) &c);
     
     printf("hello!");
 }
@@ -16,8 +15,7 @@ int doit(int a){
 int main(void){
 
     int a[20];
-    printf("varinfo:a:20:%08lx",(void *) &a);
-    
-    doit();
+    printf("varinfo:a:20:%08lx\n",(void *) &a);
+    doit(12);
     return 0;
 }

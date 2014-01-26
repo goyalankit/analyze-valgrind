@@ -61,7 +61,7 @@ class MyRecursiveASTVisitor
 
 std::string printMethodName(std::string variable_name, const int size){
     std::stringstream method_name;
-    method_name << "\nprintf(\"varinfo:" << variable_name << ":"<< size << ":\%08lx\"," << "(void *) &" << variable_name << ");\n";
+    method_name << "\nprintf(\"varinfo:" << variable_name << ":"<< size << ":\%08lx\\n\"," << "(void *) &" << variable_name << ");";
     return method_name.str();
 }
 
