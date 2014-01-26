@@ -1,44 +1,7 @@
-/***   CIrewriter.cpp   ******************************************************
- * This code is licensed under the New BSD license.
- * See LICENSE.txt for details.
- *
- * This tutorial was written by Robert Ankeney.
- * Send comments to rrankene@gmail.com.
+/***   Instrumentation.cpp   ******************************************************
  * 
- * This tutorial is an example of using the Clang Rewriter class coupled
- * with the RecursiveASTVisitor class to parse and modify C code.
- *
- * Expressions of the form:
- *     (expr1 && expr2)
- * are rewritten as:
- *     L_AND(expr1, expr2)
- * and expressions of the form:
- *     (expr1 || expr2)
- * are rewritten as:
- *     L_OR(expr1, expr2)
- *
- * Functions are located and a comment is placed before and after the function.
- *
- * Statements of the type:
- *   if (expr)
- *      xxx;
- *   else
- *      yyy;
- *
- * are converted to:
- *   if (expr)
- *   {
- *      xxx;
- *   }
- *   else
- *   {
- *      yyy;
- *   }
- *
- * And similarly for while and for statements.
- *
- * Interesting information is printed on stderr.
- *
+ * Add print statements after the declaration of variables in c++ code
+ * 
  * Usage:
  * CIrewriter <options> <file>.c
  * where <options> allow for parameters to be passed to the preprocessor
@@ -46,8 +9,6 @@
  *
  * Generated as output <file>_out.c
  *
- * Note: This tutorial uses the CompilerInstance object which has as one of
- * its purposes to create commonly used Clang types.
  *****************************************************************************/
 
 #include <sys/types.h>
