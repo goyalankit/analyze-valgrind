@@ -7,9 +7,8 @@
 int doit(int a){
     int b;
     int c[10];
+    for(int k=0;k<10;k++) c[k] = 23;
     printf("varinfo:c:10:%08lx\n",(void *) &c);
-    
-    printf("hello!");
 }
 
 int main(void){
