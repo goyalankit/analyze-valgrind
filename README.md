@@ -1,5 +1,5 @@
-Analyze valgrind output from Lackey tool
-=======================
+####Analyze valgrind output from Lackey tool
+
 
 Instrument the c code using clang and then parse the output of Valgrind.
 
@@ -11,6 +11,7 @@ Instrument the c code using clang and then parse the output of Valgrind.
 4. Parser requires boost libraries.
 
 #### Instrumentation
+---
 ```
 cd instrumentation
 make
@@ -19,7 +20,10 @@ make
 
 A new file `foo_c.c` will be generated with appropriate print instructions inserted in the source code.
 
+
+
 #### Parser
+---
 name the trace from valgrind lackey as `res`. //TODO: need to add a cli argument for the filename
 
 ```
