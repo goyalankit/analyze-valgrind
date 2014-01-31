@@ -53,7 +53,8 @@ int main()
             std::cout << temp.size() << std::endl;
             cout << temp[0] << " " << temp[1] << " str " << strs[1] ;
             */
-            std::cout << "variable:"<< strs[0] << " index:" << strs[1] <<  std::endl;
+            int x = boost::lexical_cast<int>(strs[1])/4;
+            std::cout << "variable:"<< strs[0] << " index:" << x <<  std::endl;
                 
         }
     }
