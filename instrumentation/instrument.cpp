@@ -42,6 +42,10 @@
 #include "clang/Rewrite/Frontend/Rewriters.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 
+#define BEFORE_FUNCTION_CALL 0
+#define AFTER_FUNCTION_CALL 1
+
+
 using namespace clang;
 
 // RecursiveASTVisitor is is the big-kahuna visitor that traverses
@@ -54,9 +58,49 @@ class MyRecursiveASTVisitor
         MyRecursiveASTVisitor(Rewriter &R) : Rewrite(R) { }
         void InstrumentDeclStmt(DeclStmt *s);
         bool VisitStmt(Stmt *s);
+        bool VisitCallExpr(CallExpr *E);
 
         Rewriter &Rewrite;
 };
+
+std::string printMethodDeclaration(std::string method_name, int type){
+    std::stringstream line;
+    std::stringstream method_to_be_called;
+    if(type == BEFORE_FUNCTION_CALL){
+        line  << "beforemethodcall:"<< method_name<< "";
+        method_to_be_called << "\nprintf(\"" << line.str() << "\")\n";
+    }
+    else if(type == AFTER_FUNCTION_CALL){
+        line  << "aftermethodcall:"<< method_name<< "";
+        method_to_be_called << "\nprintf(\"" << line.str() << "\")\n";
+    }
+    return method_to_be_called.str();
+}
+
+
+
+bool MyRecursiveASTVisitor::VisitCallExpr (CallExpr *node) {
+
+    if (node->getDirectCallee()) 
+    {
+        FunctionDecl *func_decl = node->getDirectCallee();
+        std::string function_name = func_decl->getNameAsString();
+
+        if(function_name!="printf"){
+            SourceLocation ST = node->getLocStart();
+            Rewrite.InsertText(ST, printMethodDeclaration(function_name,BEFORE_FUNCTION_CALL), true, true);
+
+            SourceLocation END = node->getLocEnd();
+            int offset = Lexer::MeasureTokenLength(END, Rewrite.getSourceMgr(), Rewrite.getLangOpts()) + 1;
+            SourceLocation END1 = END.getLocWithOffset(offset);
+            Rewrite.InsertText(END1, printMethodDeclaration(function_name,AFTER_FUNCTION_CALL), true, true);
+
+        }
+    }
+
+    return true; 
+}
+
 
 
 std::string printMethodName(std::string variable_name, const int size){

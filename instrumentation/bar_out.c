@@ -21,7 +21,11 @@ int main(void){
     printf("varinfo:b:100:%08lx\n",(void *) &b);
     a[2] = 23;
     printf("%d", a[2]);
+    
+    printf("beforemethodcall:foo")
     foo(a, b);
+    printf("aftermethodcall:foo")
+    
 
     return 0;
 }
