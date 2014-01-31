@@ -22,9 +22,9 @@ int main(void){
     a[2] = 23;
     printf("%d", a[2]);
     
-    printf("beforemethodcall:foo");
+    printf("\nbeforemethodcall:foo\n");
     foo(a, b);
-    printf("aftermethodcall:foo");
+    printf("\naftermethodcall:foo\n");
     
 
     return 0;
