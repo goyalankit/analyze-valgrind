@@ -16,15 +16,15 @@ void foo(int b[100], int a[100]){
 
 int main(void){
     int a[100];
-    printf("varinfo:a:100:%08lx\n",(void *) &a);
+    fprintf(stderr,"varinfo:a:100:%08lx\n",(void *) &a);
     int b[100];
-    printf("varinfo:b:100:%08lx\n",(void *) &b);
+    fprintf(stderr,"varinfo:b:100:%08lx\n",(void *) &b);
     a[2] = 23;
     printf("%d", a[2]);
     
-    printf("\nbeforemethodcall:foo\n");
+    fprintf(stderr,"\nbeforemethodcall:foo\n");
     foo(a, b);
-    printf("\naftermethodcall:foo\n");
+    fprintf(stderr,"\naftermethodcall:foo\n");
     
 
     return 0;

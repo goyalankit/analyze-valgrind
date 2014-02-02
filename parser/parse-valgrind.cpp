@@ -48,6 +48,7 @@ int main()
         
     std::string line;
     std::cout <<"file size" << f_in_cache.size() << std::endl;
+    bool start_recording = false;
     for(std::vector<string>::iterator it = f_in_cache.begin(); it!=f_in_cache.end(); ++it )
     {   
         line = *it;
@@ -55,27 +56,36 @@ int main()
         if (line.find("==")!=std::string::npos) continue;
         else if(line.find("varinfo")!=std::string::npos) continue;
         else{
+            
+            if(!start_recording && (line.find("beforemethod")!=std::string::npos)){
+   //                 std::cout << "before method...starting recording" << std::endl;
+                    start_recording = true; 
+                    continue;
+            } else if(!start_recording){ continue; }
+            else if(start_recording && (line.find("aftermethod")!=std::string::npos)){
+     //           std::cout << "after method...stop recording" << std::endl;
+                start_recording = false;
+                continue;
+            }
+
+
             std::vector<std::string> temp;
             std::vector<std::string> strs;
             trim(line);
+            if(line=="") continue;
             boost::split(temp, line, boost::is_any_of("  ")); //line the string to be split
-
             if(temp.size() == 2)
                 boost::split(strs, temp[1], boost::is_any_of(",")); //line the string to be split
             else
                 boost::split(strs, temp[2], boost::is_any_of(",")); //line the string to be split
-            /*
-            std::cout << line << std::endl;
+            
+/*            std::cout << line << std::endl;
             std::cout << temp.size() << std::endl;
             cout << temp[0] << " " << temp[1] << " str " << strs[1] ;
-            */
+  */          
             tr1::unordered_map<std::string, vector< unsigned int > >::iterator iter;
 
-            int count = 0;
-
             for (iter = variables.begin() ; iter != variables.end(); ++iter){
-                count++;
-//                if(count < 10) std::cout << ltox(strs[0]) << std::endl;
                 unsigned int add_acc = ltox(strs[0]);
                 if((add_acc >= iter->second[0]) && (add_acc <=  iter->second[1])){
                     unsigned int index_ac = (add_acc - iter->second[0]) / 4;
@@ -86,8 +96,6 @@ int main()
         }
     }
 }
-
-
 
 unsigned int ltox(std::string myhex){
     unsigned int x = strtoul(myhex.c_str(), NULL, 16);
