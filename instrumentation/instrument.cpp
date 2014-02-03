@@ -68,11 +68,11 @@ std::string printMethodDeclaration(std::string method_name, int type){
     std::stringstream method_to_be_called;
     if(type == BEFORE_FUNCTION_CALL){
         line  << "beforemethodcall:"<< method_name<< "";
-        method_to_be_called << "\nprintf(\"\\n" << line.str() << "\\n\");\n";
+        method_to_be_called << "\nfprintf(stderr, \"\\n" << line.str() << "\\n\");\n";
     }
     else if(type == AFTER_FUNCTION_CALL){
         line  << "aftermethodcall:"<< method_name<< "";
-        method_to_be_called << "\nprintf(\"\\n" << line.str() << "\\n\");\n";
+        method_to_be_called << "\nfprintf(stderr, \"\\n" << line.str() << "\\n\");\n";
     }
     return method_to_be_called.str();
 }
