@@ -11,7 +11,6 @@ void foo(int b[100], int a[100]){
             a[i] = 21 + b[i-1];
     }
     b[3]  = 23;
-    printf("hello %d",b[2]);
 }
 
 int main(void){

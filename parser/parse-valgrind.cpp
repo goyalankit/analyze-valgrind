@@ -48,7 +48,7 @@ int main()
         
     std::string line;
     std::cout <<"file size" << f_in_cache.size() << std::endl;
-    bool start_recording = false;
+    bool start_recording = true;
     for(std::vector<string>::iterator it = f_in_cache.begin(); it!=f_in_cache.end(); ++it )
     {   
         line = *it;
@@ -56,15 +56,15 @@ int main()
         if (line.find("==")!=std::string::npos) continue;
         else if(line.find("varinfo")!=std::string::npos) continue;
         else{
-            
-            if(!start_recording && (line.find("beforemethod")!=std::string::npos)){
+           
+            if((line.find("beforemethod")!=std::string::npos)){
    //                 std::cout << "before method...starting recording" << std::endl;
                     start_recording = true; 
                     continue;
-            } else if(!start_recording){ continue; }
-            else if(start_recording && (line.find("aftermethod")!=std::string::npos)){
+            }// else if(!start_recording){ start_recording = true; continue;}
+            else if((line.find("aftermethod")!=std::string::npos)){
      //           std::cout << "after method...stop recording" << std::endl;
-                start_recording = false;
+                start_recording = true;
                 continue;
             }
 
@@ -79,7 +79,8 @@ int main()
             else
                 boost::split(strs, temp[2], boost::is_any_of(",")); //line the string to be split
             
-/*            std::cout << line << std::endl;
+/*          
+ *          std::cout << line << std::endl;
             std::cout << temp.size() << std::endl;
             cout << temp[0] << " " << temp[1] << " str " << strs[1] ;
   */          
@@ -88,10 +89,9 @@ int main()
             for (iter = variables.begin() ; iter != variables.end(); ++iter){
                 unsigned int add_acc = ltox(strs[0]);
                 if((add_acc >= iter->second[0]) && (add_acc <=  iter->second[1])){
-                    unsigned int index_ac = (add_acc - iter->second[0]) / 4;
+                    unsigned int index_ac = ((add_acc - iter->second[0]) / 4);
                     std::cout << "variable:"<< iter->first << " index:" << index_ac <<  std::endl;
                 }
-                
             }
         }
     }

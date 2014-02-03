@@ -22,7 +22,7 @@ unsigned int ltox(std::string hex);
 
 int main()
 {
-    std::ifstream input( "macout" );
+    std::ifstream input( "res" );
     tr1::unordered_map<std::string, vector< unsigned int > > variables;
     //std::vector< <std::string, vector<s>> > variables;
     vector<string> f_in_cache;

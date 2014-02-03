@@ -1,16 +1,17 @@
-#!/bin/ruby
+#!/work/02681/ankitg/programs/bin/ruby
 
 require 'csv'
+require 'pry'
 
 ms = [] #macpo sequence
 vs = [] #valgrind sequence
 
 CSV.foreach("mac-seq") do |row|
-    ms << row
+    ms << row[0]
 end
 
-CSV.foreach("val-seq") do |row|
-    vs << row
+CSV.foreach("indexxx") do |row|
+    vs << row[0]
 end
 
 current_index = -1
@@ -42,11 +43,11 @@ p "number of different series - #{count}"
 p "macpo sequence count - #{ms_count.length}"
 p "valgrind sequence count - #{vs_count.length}"
 
-=begin
 ms.each_with_index do |m,oi|    
 #   p "value #{m} index #{oi}"
     found = false
     vs.each_with_index do |v,i|
+        binding.pry
         next if(i < current_index)
         next if v!=m
         if v==m
@@ -57,4 +58,3 @@ ms.each_with_index do |m,oi|
     end 
     p "no match found for outer index #{oi} and value #{m}" unless found
 end
-=end
