@@ -20,27 +20,33 @@ end
 
 variables = []
 
-CSV.foreach("valgrind-output") do |row|
-    next if row[0].include?("==")
-    next if row[0].include?("user") || row[0].include?("input")
-    if row[0].include?("varinfo")
-        s = row[0].split(":")
+File.readlines('valgrind-output').each do |line|
+    line = line.strip
+    next if line.nil? || line == ""
+    next if line.include?("==")
+    next if line.include?("user") || line.include?("input")
+    if line.include?("varinfo")
+        s = line.split(":")
         variables << VarInfo.new(s[1], s[3], s[2])
     end    
 end
 
-CSV.foreach("valgrind-output") do |row|
-    next if row[0].include?("==")
-    next if row[0].include?("user") || row[0].include?("input")
-    next if row[0].include?("varinfo")
-    next if row.nil? || row[0].nil? || row[0] == ""
-
+File.readlines('valgrind-output').each do |line|
+    line = line.strip
+    next if line.include?("==")
+    next if line.include?("user") || line.include?("input")
+    next if line.include?("varinfo")
+    next if line.nil? || line.nil? || line  == ""
+    
     variables.each do |v|
-        address = (row[0].split(" ")[1]).to_d
-        if((address >= v.base_address.to_d) && (address <= (v.base_address.to_d + 4 * (v.size.to_i - 1))))
-            p row
+        s = line.split(" ")[1]
+        address, size = s.split(",")
+        if((address.to_d >= v.base_address.to_d) && (address.to_d <= (v.base_address.to_d + 4 * (v.size.to_i - 1))))
+           index_accessed = (address.to_d - v.base_address.to_d) / 4
+           num_indexes = size.to_d / 4
+           num_indexes.times do |n|
+               p "#{v.name},#{index_accessed + n}"
+           end
         end
     end
 end
-
-
