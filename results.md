@@ -1,6 +1,6 @@
-Same compiler (Macpo) - No vectorization. Nothing
+Same compiler (Macpo) - default
 
-
+```
 "L,i,0,4" RW: i+0
 "S,i,0,4"
 "L,i,1,4" RW: i+4
@@ -21,9 +21,11 @@ Same compiler (Macpo) - No vectorization. Nothing
 "S,i,8,4"
 "L,i,9,4" RW: i+36
 "S,i,9,4"
+```
 
 `icc -mno-sse` Without Vectorization
 
+```
 "M,i,0,4" RW: i+0
 "M,i,1,4" RW: i+4
 "M,i,2,4" RW: i+8
@@ -34,19 +36,22 @@ Same compiler (Macpo) - No vectorization. Nothing
 "M,i,7,4" RW: i+28
 "M,i,8,4" RW: i+32
 "M,i,9,4" RW: i+36
+```
 
+`icc` default with vectorization
 
+```
+"L,i,0,16" # 0 1 2 3
 "L,i,0,16"
 "L,i,0,16"
 "L,i,0,16"
 "L,i,0,16"
-"L,i,0,16"
+"L,i,4,16" # 4 5 6 7
 "L,i,4,16"
 "L,i,4,16"
 "L,i,4,16"
 "L,i,4,16"
-"L,i,4,16"
-"S,i,0,16"
+"S,i,0,16" 
 "S,i,0,16"
 "S,i,0,16"
 "S,i,0,16"
@@ -56,5 +61,6 @@ Same compiler (Macpo) - No vectorization. Nothing
 "S,i,4,16"
 "S,i,4,16"
 "S,i,4,16"
-"M,i,8,4"
-"M,i,9,4"
+"M,i,8,4" # 8
+"M,i,9,4" # 9
+```
