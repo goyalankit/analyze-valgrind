@@ -6,11 +6,11 @@ require 'pry'
 ms = [] #macpo sequence
 vs = [] #valgrind sequence
 
-CSV.foreach("mac-seq") do |row|
+CSV.foreach("macpo-output") do |row|
     ms << row[0]
 end
 
-CSV.foreach("indexxx") do |row|
+CSV.foreach("val-out") do |row|
     vs << row[0]
 end
 
@@ -47,7 +47,6 @@ ms.each_with_index do |m,oi|
 #   p "value #{m} index #{oi}"
     found = false
     vs.each_with_index do |v,i|
-        binding.pry
         next if(i < current_index)
         next if v!=m
         if v==m

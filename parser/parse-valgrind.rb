@@ -20,7 +20,7 @@ end
 
 variables = []
 
-File.readlines('valgrind-output').each do |line|
+File.readlines(ARGV[0]).each do |line|
     line = line.strip
     next if line.nil? || line == ""
     next if line.include?("==")
@@ -31,7 +31,13 @@ File.readlines('valgrind-output').each do |line|
     end    
 end
 
-File.readlines('valgrind-output').each do |line|
+#p variables[0].base_address.to_d
+
+variables[0].size.to_i.times do |vr|
+#    p "#{vr} #{ variables[0].base_address.to_d + vr*4}"
+end
+
+File.readlines(ARGV[0]).each do |line|
     line = line.strip
     next if line.include?("==")
     next if line.include?("user") || line.include?("input")
@@ -39,13 +45,19 @@ File.readlines('valgrind-output').each do |line|
     next if line.nil? || line.nil? || line  == ""
     
     variables.each do |v|
-        s = line.split(" ")[1]
+        ts = line.split(" ")
+        instruction = ts[0]
+        s = ts[1]
         address, size = s.split(",")
+        if(address.to_d == v.base_address.to_d)
+            #p "#{v.name} - #{v.size}"
+        end
+
         if((address.to_d >= v.base_address.to_d) && (address.to_d <= (v.base_address.to_d + 4 * (v.size.to_i - 1))))
            index_accessed = (address.to_d - v.base_address.to_d) / 4
            num_indexes = size.to_d / 4
            num_indexes.times do |n|
-               p "#{v.name},#{index_accessed + n}"
+               p "#{ts[0]},#{v.name},#{index_accessed},#{size}"
            end
         end
     end
