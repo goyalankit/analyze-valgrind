@@ -1,0 +1,27 @@
+W : b+9 #1
+W : a+9 S,a,9,4
+R : b+8 #absent
+W : b+8 #2
+W : a+8 S,a,8,4
+R : b+7 #absent
+W : b+7
+W : a+7 S,a,7,4
+R : b+6 #absent
+W : b+6
+W : a+6 S,a,6,4
+R : b+5 #absent
+W : b+5
+W : a+5 S,a,5,4
+R : b+4 #absent
+W : b+4 
+W : a+4 S,a,4,4
+R : b+3 #absent
+W : b+3
+W : a+3 S,a,3,4
+R : b+2 #absent
+W : b+2 #absent
+W : b+1 #absent
+W : b+3 #absent
+
+#READING B ALL THE TIME
+#NOT LOADING A
