@@ -1,0 +1,5 @@
+#!/bin/env sh
+
+macpo.sh --macpo:gen-trace=$1 $2 -o macpo
+./macpo
+macpo-analyze macpo.out
