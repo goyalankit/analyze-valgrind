@@ -38,13 +38,28 @@ end
 #    p "#{vr} #{ variables[0].base_address.to_d + vr*4}"
 #end
 
+def print_like_macpo type, name, index, size
+    case type
+    when "S"
+        mytype = "W"
+    when "L"
+        mytype = "R"
+    when "M"
+        mytype = "RW"
+    else
+        mytype = type
+    end
+    puts "#{mytype} : #{name}+#{index} : #{size}"
+end
+
+
 File.readlines(ARGV[1]).each do |line|
     line = line.strip
     next if line.include?("==")
     next if line.include?("user") || line.include?("input")
     next if line.include?("varinfo") || line.include?("START") || line.include?("THREAD")
     next if line.nil? || line.nil? || line  == ""
-    
+
     variables.each do |v|
         if (false) 
             ts = line.split(" ")
@@ -63,11 +78,12 @@ File.readlines(ARGV[1]).each do |line|
 
 
         if((address.to_d >= v.base_address.to_d) && (address.to_d <= (v.base_address.to_d + 4 * (v.size.to_i - 1))))
-           index_accessed = (address.to_d - v.base_address.to_d) / 4
-           num_indexes = size.to_d / 4
-           num_indexes.times do |n|
-               p "#{ts[0]},#{v.name},#{index_accessed},#{size}"
-           end
+            index_accessed = (address.to_d - v.base_address.to_d) / 4
+            num_indexes = size.to_d / 4
+            num_indexes.times do |n|
+                print_like_macpo ts[0], v.name, index_accessed, size if !ARGV[2].nil? && ARGV[2] == "mlo"
+                p "#{ts[0]},#{v.name},#{index_accessed},#{size}" unless !ARGV[2].nil? && ARGV[2] == "mlo"
+            end
         end
     end
 end
