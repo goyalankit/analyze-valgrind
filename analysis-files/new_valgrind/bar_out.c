@@ -1,7 +1,7 @@
-#include "/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h"
+//#include "/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h"
 #include<stdio.h>
 
-void foo(int b[10], int a[10]){
+void foo(int a[10], int b[10]){
     int i;
     for(i=9; i > 0; i--){ 
         b[i] = 12;
@@ -14,14 +14,14 @@ void foo(int b[10], int a[10]){
 int main(void){
     int a[10];
     printf("varinfo:a:10:%08lx\n",(void *) &a);
-    int b[100];
+    int b[10];
     printf("varinfo:b:10:%08lx\n",(void *) &b);
     a[2] = 23;
     printf("%d", a[2]);
 
-    GL_GLOBAL_START_INSTR;
+    //GL_GLOBAL_START_INSTR;
     foo(a, b);
-    GL_GLOBAL_STOP_INSTR;
+   // GL_GLOBAL_STOP_INSTR;
 
     return 0;
 }
