@@ -1,0 +1,93 @@
+#!/bin/env sh
+
+run(){
+
+    if [ "$1" == "" ]; then 
+        echo "USAGE valgrind.sh source.c";
+        exit;
+    fi
+
+    /work/02681/ankitg/workspace/valgrind/bin/valgrind --read-var-info=yes --tool=gleipnir $1 &> $1_val_out
+}
+
+
+getFileName(){
+
+    filename=$(basename "$1")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+    
+    echo "$filename"
+}
+
+clean(){
+    rm -rf gleipnir.*
+}
+
+clr(){
+    rm -rf gleipnir.*
+    rm -rf *.gcc
+    rm -rf *.icc
+}
+
+clro(){
+    clr
+    rm -rf *_val_out
+}
+
+gc(){
+
+    filename=$(basename "$1")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+ 
+
+#    filename=$(getFileName($1))
+    gcc $1 -o $filename.gcc
+}
+
+
+gccrun(){
+    gc $1;    
+
+    filename=$(basename "$1")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+ 
+    run $filename.gcc
+}
+
+
+
+ic(){
+
+    filename=$(basename "$1")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+ 
+    icc $1 -o $filename.icc
+}
+
+iccrun(){
+    ic $1;    
+
+    filename=$(basename "$1")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+ 
+    run $filename.icc
+}
+
+case $1 in
+    run) run $2;;
+    clean) clean;;
+    clr) clr;;
+    clro) clro;;
+    gcc | gc | g) gc $2;;
+    icc | ic | i) ic $2;;
+    icrun | iccrun | irun) iccrun $2;;
+    gcrun | gccrun | grun) gccrun $2;;
+    help ) echo "Usage $0 {run|clean|clr|gcc|icc|icrun|gcrun}";;
+    *) run $1;;
+esac
+
