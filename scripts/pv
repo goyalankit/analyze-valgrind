@@ -1,3 +1,5 @@
+#!/work/02681/ankitg/programs/bin/ruby
+
 require 'csv'
 require 'pry'
 
@@ -31,27 +33,34 @@ File.readlines(ARGV[0]).each do |line|
     end    
 end
 
-#p variables[0].base_address.to_d
 
-variables[0].size.to_i.times do |vr|
+#variables[0].size.to_i.times do |vr|
 #    p "#{vr} #{ variables[0].base_address.to_d + vr*4}"
-end
+#end
 
-File.readlines(ARGV[0]).each do |line|
+File.readlines(ARGV[1]).each do |line|
     line = line.strip
     next if line.include?("==")
     next if line.include?("user") || line.include?("input")
-    next if line.include?("varinfo")
+    next if line.include?("varinfo") || line.include?("START") || line.include?("THREAD")
     next if line.nil? || line.nil? || line  == ""
     
     variables.each do |v|
-        ts = line.split(" ")
-        instruction = ts[0]
-        s = ts[1]
-        address, size = s.split(",")
-        if(address.to_d == v.base_address.to_d)
-            #p "#{v.name} - #{v.size}"
+        if (false) 
+            ts = line.split(" ")
+            instruction = ts[0]
+            s = ts[1]
+            address, size = s.split(",")
+            if(address.to_d == v.base_address.to_d)
+                #p "#{v.name} - #{v.size}"
+            end
+        else
+            ts = line.split(" ")
+            instruction = ts[0]
+            address = ts[1]
+            size = ts[2]
         end
+
 
         if((address.to_d >= v.base_address.to_d) && (address.to_d <= (v.base_address.to_d + 4 * (v.size.to_i - 1))))
            index_accessed = (address.to_d - v.base_address.to_d) / 4

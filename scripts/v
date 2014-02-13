@@ -65,7 +65,7 @@ ic(){
     extension="${filename##*.}"
     filename="${filename%.*}"
  
-    icc $1 -o $filename.icc
+    icc -mno-sse $1 -o $filename.icc
 }
 
 iccrun(){
