@@ -11,21 +11,35 @@ class BaseParser
         @filename = filename
         @results = {}
     end
+
+    #override this method in case of different format of file
+    def get_var_name line
+        line.strip.split(":")[1].split("+")[0].strip
+    end
+
+    def get_comparison_string line
+        raise "Hey you need to redefine this method"
+    end
+
+    def parse_file
+        File.readlines(@filename).each do |line|
+            next if line.strip == "" || line.nil?
+            var_name = get_var_name line
+            @results[var_name] = [] if @results[var_name].nil?
+            @results[var_name] << get_comparison_string(line)
+        end
+        @results
+    end
 end
 
 #
 # Parse the valgrind file
 #
 
+
 class Valgrind < BaseParser
-    def parse_file
-        File.readlines(@filename).each do |line|
-            next if line.strip == "" || line.nil?
-            var_name = line.strip.split(":")[1].split("+")[0].strip
-            @results[var_name] = [] if @results[var_name].nil?
-            @results[var_name] << line.strip.split(":").map{|i| i.strip}[0...-1].join
-        end
-        @results
+    def get_comparison_string line
+        line.strip.split(":").map{|i| i.strip}[0...-1].join
     end
 end
 
@@ -34,14 +48,8 @@ end
 #
 
 class Macpo < BaseParser
-    def parse_file
-        File.readlines(@filename).each do |line|
-            next if line.strip == "" || line.nil?
-            var_name = line.strip.split(":")[1].split("+")[0].strip
-            @results[var_name] = [] if @results[var_name].nil?
-            @results[var_name] << line.strip.split(":").map{|i| i.strip}[0..-1].join
-        end
-        @results
+    def get_comparison_string line
+        line.strip.split(":").map{|i| i.strip}[0..-1].join
     end
 end
 
@@ -86,7 +94,7 @@ class Analyzer
         result = Result.new
         @vresults.keys.each do |key|            
             @vresults[key].each_with_index do |vvalue, index|
-                puts "Warning: Number of values don't match for variable - #{key}"
+                puts "Warning: Number of values don't match for variable - #{key}" if @vresults[key].size != @mresults[key].size
                 match = false                
                 @mresults[key].drop(index).each do |mvalue|
                     if(mvalue == vvalue)

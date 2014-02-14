@@ -12,9 +12,6 @@ end
 Trollop::die :vf, "must be non-negative" unless opts[:vf_given]
 Trollop::die :mc, "must be non-negative" unless opts[:mc_given]
 
-
-
-
 valgrind = Valgrind.new(opts[:vf])
 macpo = Macpo.new(opts[:mc])
 vresult = valgrind.parse_file
