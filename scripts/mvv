@@ -1,0 +1,24 @@
+#!/work/02681/ankitg/programs/bin/ruby
+
+require 'trollop'
+require 'pry'
+require "./parser_and_analyzer.rb"
+
+opts = Trollop::options do
+    opt :vf, "string --vf, give the filename for valgrind", :type => :string
+    opt :mc, "string --mc, give the filename for macpo", :type => :string
+end
+
+Trollop::die :vf, "must be non-negative" unless opts[:vf_given]
+Trollop::die :mc, "must be non-negative" unless opts[:mc_given]
+
+
+
+
+valgrind = Valgrind.new(opts[:vf])
+macpo = Macpo.new(opts[:mc])
+vresult = valgrind.parse_file
+mresult = macpo.parse_file
+
+analyzer = Analyzer.new(vresult, mresult)
+analyzer.analyze
