@@ -5,3 +5,4 @@ macpo.sh --macpo:gen-trace=$1 $2 -o macpo
 macpo-analyze macpo.out &> macf.temp
 sed -i 1,2d macf.temp
 awk -F "+" '{print $1"+"$2/4}' macf.temp > macf 
+cat macf
