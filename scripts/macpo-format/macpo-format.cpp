@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <unordered_map>
 #include <set>
-
 #include "mem-info.h"
 
 #define READ "1"
@@ -45,11 +44,9 @@ void parse_cli_options(int argc, char* argv[]){
     }
 }
 
-static inline void fill_struct(int read_write, int line_number, size_t address, int var_idx)
-{
-    // If this process was never supposed to record stats
-    // or if the file-open failed, then return
-    if (fd < 0) return;
+/* write the address access to the file */
+static inline void fill_struct(int read_write, int line_number, size_t address, int var_idx) {
+    if (fd < 0) return;//if the file-open failed, then return
 
     node_t node;
     node.type_message = MSG_MEM_INFO;
@@ -63,6 +60,7 @@ static inline void fill_struct(int read_write, int line_number, size_t address, 
     write(fd, &node, sizeof(node_t));
 }
 
+/* write the metadata */
 static inline void write_metadata(){
     node_t node;
 
@@ -80,8 +78,8 @@ static inline void write_metadata(){
     write(fd, &node, sizeof(node_t));
 }
 
-void indigo__write_idx_c(const char* var_name, const int length)
-{
+/* write the map to the binary */
+void indigo__write_idx_c(const char* var_name, const int length) {
     node_t node;
     node.type_message = MSG_STREAM_INFO;
 #define my__MIN(a,b)    (a) < (b) ? (a) : (b)
@@ -94,6 +92,7 @@ void indigo__write_idx_c(const char* var_name, const int length)
     write(fd, &node, sizeof(node_t));
 }
 
+/* Method to split the string based on a delim. without the boost lib */
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
     std::string item;
@@ -107,10 +106,11 @@ std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
-}
+}//END of the string spit methods
 
+/* parse the line from the input file. create a string to string map with the values.  */
 SS_MAP parse_line(const std::string &s){
-    SS_MAP * mymap = new SS_MAP(); //Will be freed when by the destructor
+    SS_MAP * mymap = new SS_MAP(); //will be freed by destructor
     std::vector<std::string> temp = split(s, ':');
 
     if(temp[0] == "R ")  
@@ -126,11 +126,12 @@ SS_MAP parse_line(const std::string &s){
     return *mymap;
 }
 
-
+//conversion from string address to size_t address.
 size_t strToSizt_t(std::string str){
-    size_t size_t_address;
-    std::stringstream(str) >> size_t_address;
-    return size_t_address;
+    std::stringstream ss(str);
+    void * result;
+    ss >> result;
+    return size_t(result);
 }
 
 int main(int argc, char* argv[]){
@@ -143,7 +144,7 @@ int main(int argc, char* argv[]){
     std::set<std::string> variables;
 
     //vector of map containing access information. 
-    //"rw" = [0|1], "vname" = variable name, "index" = index of the variable accessed
+    //"rw" = [0|1], "vname" = variable name, "address" = address of the variable accessed
     std::vector < SS_MAP > cached_accesses; 
 
     /* Get the file descriptor for the output file */
