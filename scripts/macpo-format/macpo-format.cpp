@@ -45,7 +45,6 @@ void parse_cli_options(int argc, char* argv[]){
     }
 }
 
-
 static inline void fill_struct(int read_write, int line_number, size_t address, int var_idx)
 {
     // If this process was never supposed to record stats
@@ -63,7 +62,6 @@ static inline void fill_struct(int read_write, int line_number, size_t address, 
 
     write(fd, &node, sizeof(node_t));
 }
-
 
 static inline void write_metadata(){
     node_t node;
@@ -105,15 +103,11 @@ std::vector<std::string> &split(const std::string &s, char delim, std::vector<st
     return elems;
 }
 
-
 std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
 }
-
-
-
 
 SS_MAP parse_line(const std::string &s){
     SS_MAP * mymap = new SS_MAP(); //Will be freed when by the destructor
@@ -127,11 +121,17 @@ SS_MAP parse_line(const std::string &s){
     temp = split(temp[1], '+');
 
     (*mymap)["vname"] = temp[0];
-    (*mymap)["index"] = temp[1];
+    (*mymap)["address"] = temp[1];
 
     return *mymap;
 }
 
+
+size_t strToSizt_t(std::string str){
+    size_t size_t_address;
+    std::stringstream(str) >> size_t_address;
+    return size_t_address;
+}
 
 int main(int argc, char* argv[]){
     parse_cli_options(argc, argv);
@@ -168,19 +168,29 @@ int main(int argc, char* argv[]){
 
     }
 
-    //1. Write Metadata to the file
+    /* 1. Write Metadata to the file */
     write_metadata();
 
-    /*2. write variable map */
+    /* 2. write variable map */
     for(SI_MAP::const_iterator it = var_map.begin(); it != var_map.end(); ++it){
         indigo__write_idx_c((it->first).c_str(), (it->first).length());
     }
 
+    /* 3. read_write line_number address var_idx */
     for (std::vector<SS_MAP>::const_iterator it = cached_accesses.begin(); it != cached_accesses.end(); ++it) {
         SS_MAP local_a_map = *it;
-        
+
+        int variable_index = var_map[local_a_map["vname"]];
+        size_t address = strToSizt_t(local_a_map["address"]);
+        int read_write = atoi(local_a_map["rw"].c_str());
+
+        fill_struct(read_write, -1, address, variable_index);
+
+        //DEBUG:
+        std::cout << local_a_map["vname"] << address << " " << read_write << std::endl;
     }
 
+    /* 4. Terminator */
 
     return 0;
 }
