@@ -8,10 +8,18 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include <unordered_map>
+#include <set>
 
 #include "mem-info.h"
 
+#define READ "1"
+#define WRITE "2"
+
+typedef std::unordered_map<std::string, std::string> SS_MAP; //string to string map
+typedef std::unordered_map<std::string, int> SI_MAP; //string to int map
+
+SI_MAP var_map;
 std::string m_filename;
 std::string o_filename;
 
@@ -37,14 +45,6 @@ void parse_cli_options(int argc, char* argv[]){
     }
 }
 
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
-}
 
 static inline void fill_struct(int read_write, int line_number, size_t address, int var_idx)
 {
@@ -82,23 +82,105 @@ static inline void write_metadata(){
     write(fd, &node, sizeof(node_t));
 }
 
+void indigo__write_idx_c(const char* var_name, const int length)
+{
+    node_t node;
+    node.type_message = MSG_STREAM_INFO;
+#define my__MIN(a,b)    (a) < (b) ? (a) : (b)
+    int dst_len = my__MIN(STREAM_LENGTH-1, length);
+#undef my__MIN
+
+    strncpy(node.stream_info.stream_name, var_name, dst_len);
+    node.stream_info.stream_name[dst_len] = '\0';
+
+    write(fd, &node, sizeof(node_t));
+}
+
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
+
+
+
+
+SS_MAP parse_line(const std::string &s){
+    SS_MAP * mymap = new SS_MAP(); //Will be freed when by the destructor
+    std::vector<std::string> temp = split(s, ':');
+
+    if(temp[0] == "R ")  
+        (*mymap)["rw"] = READ;
+    else if(temp[0] == "W ") 
+        (*mymap)["rw"] = WRITE;
+
+    temp = split(temp[1], '+');
+
+    (*mymap)["vname"] = temp[0];
+    (*mymap)["index"] = temp[1];
+
+    return *mymap;
+}
+
+
 int main(int argc, char* argv[]){
     parse_cli_options(argc, argv);
-    std::vector<std::string> * tokens = new std::vector<std::string>();
+    std::vector<std::string> tokens;
 
     std::ifstream m_stream(m_filename);
-    std::string line;
 
+    //to store variables for map
+    std::set<std::string> variables;
+
+    //vector of map containing access information. 
+    //"rw" = [0|1], "vname" = variable name, "index" = index of the variable accessed
+    std::vector < SS_MAP > cached_accesses; 
+
+    /* Get the file descriptor for the output file */
     const char *macpo_fn = o_filename.c_str();
     fd = open(macpo_fn , O_CREAT | O_APPEND | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP);
+
+
+    SS_MAP access_map;
+    std::string line;
+
+    int var_ind=0;
+    /* read, cache the file and build map */
+    while(std::getline(m_stream, line)){
+
+        access_map = parse_line(line);
+        cached_accesses.push_back(access_map); //cache the access
+
+        int map_size = var_map.size();
+        var_map[access_map["vname"]] = var_ind; //add the variables to their map
+
+        if(var_map.size() > map_size) var_ind++;
+
+    }
 
     //1. Write Metadata to the file
     write_metadata();
 
-    while(std::getline(m_stream, line)){
-
+    /*2. write variable map */
+    for(SI_MAP::const_iterator it = var_map.begin(); it != var_map.end(); ++it){
+        indigo__write_idx_c((it->first).c_str(), (it->first).length());
     }
 
-    delete tokens;
+    for (std::vector<SS_MAP>::const_iterator it = cached_accesses.begin(); it != cached_accesses.end(); ++it) {
+        SS_MAP local_a_map = *it;
+        
+    }
+
+
     return 0;
 }
