@@ -28,7 +28,7 @@ int fd;
 /* Command line parser */
 void parse_cli_options(int argc, char* argv[]){
     if (argc < 5) { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-        std::cout << "Usage is -in <infile>\n"; // Inform the user of how to use the program
+        std::cout << "Usage is -f <valgrind filename> -o <output filename>\n"; // Inform the user of how to use the program
         std::cin.get();
         exit(0);
     } else {
