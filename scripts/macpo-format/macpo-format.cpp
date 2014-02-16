@@ -16,6 +16,8 @@
 
 #define READ "1"
 #define WRITE "2"
+#define READ_AND_WRITE "3"
+#define UNKNOWN "2"
 
 typedef std::unordered_map<std::string, std::string> SS_MAP; //string to string map
 typedef std::unordered_map<std::string, int> SI_MAP; //string to int map
@@ -174,10 +176,17 @@ SS_MAP parse_line(const std::string &s){
     }
     else
     {
-        if(temp[0] == "R ")        (*mymap)["rw"] = TYPE_READ;
-        else if(temp[0] == "W ")   (*mymap)["rw"] = TYPE_WRITE;
-        else if(temp[0] == "RW ")  (*mymap)["rw"] = TYPE_READ_AND_WRITE;
-        else                       (*mymap)["rw"] = TYPE_UNKNOWN;
+        if(temp[0] == "R ")
+            (*mymap)["rw"] = READ;
+        else if(temp[0] == "W ")
+            (*mymap)["rw"] = WRITE;
+        else if(temp[0] == "RW ")
+            (*mymap)["rw"] = READ_AND_WRITE;
+        else
+            (*mymap)["rw"] = UNKNOWN;
+
+
+        std::cout << "Type " << temp[0] << " " << (*mymap)["rw"]  << std::endl;
 
         temp = split(temp[1], '+');
 
