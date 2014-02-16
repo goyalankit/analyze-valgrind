@@ -14,9 +14,9 @@
 #include <cstring>
 #include <stdlib.h>
 
- #include <boost/algorithm/string.hpp>
- #include <boost/algorithm/string/classification.hpp>
- #include "boost/lexical_cast.hpp"
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include "boost/lexical_cast.hpp"
 
 #define READ "1"
 #define WRITE "2"
@@ -27,7 +27,6 @@ typedef std::tr1::unordered_map<std::string, std::string> SS_MAP; //string to st
 typedef std::tr1::unordered_map<std::string, int> SI_MAP; //string to int map
 
 using namespace boost::algorithm;
-using boost
 
 SI_MAP var_map;
 std::vector<std::string> var_index;
@@ -185,7 +184,8 @@ SS_MAP parse_line(const std::string &s){
     if(isVarInfo)
     {
         var_base_map[temp[1]] = temp[3];
-        std::cout << "TEMP" << temp[1] << " " << temp[3] << std::endl;
+        //DEBUG:
+        //std::cout << "TEMP" << temp[1] << " " << temp[3] << std::endl;
         insertInCache = false;
     }
     else
@@ -279,9 +279,9 @@ int main(int argc, char* argv[]){
     for (std::vector<SS_MAP>::const_iterator it = cached_accesses.begin(); it != cached_accesses.end(); ++it) {
         SS_MAP local_a_map = *it;
 
-        int variable_index = var_map[local_a_map.at("vname")];
-        size_t address = ltox(local_a_map.at("address"));
-        size_t base_address = ltox(var_base_map.at(local_a_map.at("vname")));
+        int variable_index = var_map[local_a_map["vname"]];
+        size_t address = ltox(local_a_map["address"]);
+        size_t base_address = ltox(var_base_map[local_a_map["vname"]]);
 
         int read_write = atoi(local_a_map["rw"].c_str());
 
