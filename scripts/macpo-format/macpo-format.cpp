@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstdint>
+//#include <cstdint>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -8,15 +8,17 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <unordered_map>
+#include <tr1/unordered_map>
 #include <set>
 #include "macpo_record.h"
+#include <cstring>
+#include <stdlib.h>
 
 #define READ "1"
 #define WRITE "2"
 
-typedef std::unordered_map<std::string, std::string> SS_MAP; //string to string map
-typedef std::unordered_map<std::string, int> SI_MAP; //string to int map
+typedef std::tr1::unordered_map<std::string, std::string> SS_MAP; //string to string map
+typedef std::tr1::unordered_map<std::string, int> SI_MAP; //string to int map
 
 SI_MAP var_map;
 SS_MAP var_base_map;
@@ -28,7 +30,8 @@ int fd;
 bool insertInCache;
 
 /* Command line parser */
-void parse_cli_options(int argc, char* argv[]){
+/*
+   void parse_cli_options(int argc, char* argv[]){
     if (argc < 5) { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
         std::cout << "Usage is -f <valgrind filename> -o <output filename>\n"; // Inform the user of how to use the program
         std::cin.get();
@@ -37,15 +40,18 @@ void parse_cli_options(int argc, char* argv[]){
         char* myFile;
         for (int i = 1; i < argc; i+=2) {
             if (i + 1 != argc){
-                if (strcmp(argv[i],"-f") == 0) {
+//                if (strcmp(argv[i],"-f") == 0) {
+                if(argv[i] == "-f"){                
                     m_filename = argv[i + 1];
-                } else if (strcmp(argv[i],"-o") == 0) {
+//                } else if (strcmp(argv[i],"-o") == 0) {
+                } else if(argv[i] == "-o"){                
                     o_filename = argv[i + 1];
                 }
             }
         }
     }
 }
+*/
 
 
 /* write the address access to the file */
@@ -159,7 +165,8 @@ SS_MAP parse_line(const std::string &s){
 
     bool isVarInfo = (temp[0] == "varinfo");
 
-    if(__builtin_expect(isVarInfo, 0))
+//    if(__builtin_expect(isVarInfo, 0))
+    if(isVarInfo)
     {
         var_base_map[temp[1]] = temp[2];
         insertInCache = false;
@@ -189,10 +196,14 @@ size_t strToSize_t(std::string str){
 }
 
 int main(int argc, char* argv[]){
-    parse_cli_options(argc, argv);
+    //parse_cli_options(argc, argv);
+
+    m_filename = argv[2];
+    o_filename = argv[4];
+
     std::vector<std::string> tokens;
 
-    std::ifstream m_stream(m_filename);
+    std::ifstream m_stream("valout");
 
     //to store variables for map
     std::set<std::string> variables;
