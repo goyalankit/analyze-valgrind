@@ -30,6 +30,7 @@ File.readlines(ARGV[0]).each do |line|
     if line.include?("varinfo")
         s = line.split(":")
         variables << VarInfo.new(s[1], s[3], s[2])
+        puts line
     end    
 end
 
@@ -51,6 +52,21 @@ def print_like_macpo type, name, index, size
     end
     puts "#{mytype} : #{name}+#{index} : #{size}"
 end
+
+def print_for_macpo_generation type, name, index, size
+    case type
+    when "S"
+        mytype = "W"
+    when "L"
+        mytype = "R"
+    when "M"
+        mytype = "RW"
+    else
+        mytype = type
+    end
+    puts "#{mytype} : #{name}+#{index} : #{size}"
+end
+
 
 
 File.readlines(ARGV[1]).each do |line|
@@ -82,7 +98,8 @@ File.readlines(ARGV[1]).each do |line|
             num_indexes = size.to_d / 4
             num_indexes.times do |n|
                 print_like_macpo ts[0], v.name, index_accessed, size if !ARGV[2].nil? && ARGV[2] == "mlo"
-                p "#{ts[0]},#{v.name},#{index_accessed},#{size}" unless !ARGV[2].nil? && ARGV[2] == "mlo"
+                print_for_macpo_generation ts[0], v.name, address, size if !ARGV[2].nil? && ARGV[2] == "macpo"
+                p "#{ts[0]},#{v.name},#{index_accessed},#{size}" if ARGV[2].nil?
             end
         end
     end
