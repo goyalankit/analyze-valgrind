@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <unordered_map>
 #include <set>
-#include "mem-info.h"
+#include "macpo_record.h"
 
 #define READ "1"
 #define WRITE "2"
@@ -19,10 +19,13 @@ typedef std::unordered_map<std::string, std::string> SS_MAP; //string to string 
 typedef std::unordered_map<std::string, int> SI_MAP; //string to int map
 
 SI_MAP var_map;
+SS_MAP var_base_map;
+
 std::string m_filename;
 std::string o_filename;
 
 int fd;
+bool insertInCache;
 
 /* Command line parser */
 void parse_cli_options(int argc, char* argv[]){
@@ -44,42 +47,82 @@ void parse_cli_options(int argc, char* argv[]){
     }
 }
 
+
 /* write the address access to the file */
-static inline void fill_struct(int read_write, int line_number, size_t address, int var_idx) {
-    if (fd < 0) return;//if the file-open failed, then return
+static inline void fill_trace_struct(int read_write, int line_number, size_t base, size_t p, int var_idx)
+{
+    // If this process was never supposed to record stats
+    // or if the file-open failed, then return
+    if (fd < 0)	return;
+
+    size_t address_base = (size_t) base;
+    size_t address = (size_t) p;
 
     node_t node;
-    node.type_message = MSG_MEM_INFO;
-    node.coreID = 1;
+    node.type_message = MSG_TRACE_INFO;
 
-    node.mem_info.read_write = read_write;
-    node.mem_info.address = address;
-    node.mem_info.var_idx = var_idx;
-    node.mem_info.line_number = line_number;
+    node.trace_info.coreID = 1;
+    node.trace_info.read_write = read_write;
+    node.trace_info.base = address_base;
+    node.trace_info.address = address;
+    node.trace_info.var_idx = var_idx;
+    node.trace_info.line_number = line_number;
 
     write(fd, &node, sizeof(node_t));
 }
 
+//Not needed now.
+static inline void fill_mem_struct(int read_write, int line_number, size_t p, int var_idx, int type_size)
+{
+    // If this process was never supposed to record stats
+    // or if the file-open failed, then return
+    if (fd < 0)	return;
+
+    node_t node;
+    node.type_message = MSG_MEM_INFO;
+
+    node.mem_info.coreID = 1;
+    node.mem_info.read_write = read_write;
+    node.mem_info.address = p;
+    node.mem_info.var_idx = var_idx;
+    node.mem_info.line_number = line_number;
+    node.mem_info.type_size = type_size;
+
+    write(fd, &node, sizeof(node_t));
+}
+
+
+
 /* write the metadata */
 static inline void write_metadata(){
+
+    if (fd < 0) return;
+
     node_t node;
 
     time_t t;
     time(&t);
     struct tm *ltm = localtime(&t);
 
-    node.metadata_info.day = ltm->tm_mday;
-    node.metadata_info.month = ltm->tm_mon+1;
-    node.metadata_info.year = ltm->tm_year+1900;
-    node.metadata_info.hour = ltm->tm_hour;
-    node.metadata_info.min = ltm->tm_min;
-    node.metadata_info.sec = ltm->tm_sec;
+    node.type_message = MSG_METADATA;
+    size_t exe_path_len = readlink ("/proc/self/exe", node.metadata_info.binary_name, STRING_LENGTH-1);
 
-    write(fd, &node, sizeof(node_t));
+    if (exe_path_len == -1)
+        perror ("MACPO :: Failed to read name of the binary from /proc/self/exe");
+    else
+    {
+        node.metadata_info.binary_name[o_filename.length()]='\0';
+        time(&node.metadata_info.execution_timestamp);
+
+        write(fd, &node, sizeof(node_t));
+    }
 }
 
 /* write the map to the binary */
 void indigo__write_idx_c(const char* var_name, const int length) {
+
+    if (fd < 0) return;
+
     node_t node;
     node.type_message = MSG_STREAM_INFO;
 #define my__MIN(a,b)    (a) < (b) ? (a) : (b)
@@ -110,24 +153,35 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 /* parse the line from the input file. create a string to string map with the values.  */
 SS_MAP parse_line(const std::string &s){
+
     SS_MAP * mymap = new SS_MAP(); //will be freed by destructor
     std::vector<std::string> temp = split(s, ':');
 
-    if(temp[0] == "R ")  
-        (*mymap)["rw"] = READ;
-    else if(temp[0] == "W ") 
-        (*mymap)["rw"] = WRITE;
+    bool isVarInfo = (temp[0] == "varinfo");
 
-    temp = split(temp[1], '+');
+    if(__builtin_expect(isVarInfo, 0))
+    {
+        var_base_map[temp[1]] = temp[2];
+        insertInCache = false;
+    }
+    else
+    {
+        if(temp[0] == "R ")
+            (*mymap)["rw"] = READ;
+        else if(temp[0] == "W ") 
+            (*mymap)["rw"] = WRITE;
 
-    (*mymap)["vname"] = temp[0];
-    (*mymap)["address"] = temp[1];
+        temp = split(temp[1], '+');
 
+        (*mymap)["vname"] = temp[0];
+        (*mymap)["address"] = temp[1];
+        insertInCache = true;
+    }
     return *mymap;
 }
 
 //conversion from string address to size_t address.
-size_t strToSizt_t(std::string str){
+size_t strToSize_t(std::string str){
     std::stringstream ss(str);
     void * result;
     ss >> result;
@@ -158,8 +212,11 @@ int main(int argc, char* argv[]){
     int var_ind=0;
     /* read, cache the file and build map */
     while(std::getline(m_stream, line)){
-
+        insertInCache = true;
         access_map = parse_line(line);
+
+        if(!insertInCache) continue;
+
         cached_accesses.push_back(access_map); //cache the access
 
         int map_size = var_map.size();
@@ -182,10 +239,11 @@ int main(int argc, char* argv[]){
         SS_MAP local_a_map = *it;
 
         int variable_index = var_map[local_a_map["vname"]];
-        size_t address = strToSizt_t(local_a_map["address"]);
+        size_t address = strToSize_t(local_a_map["address"]);
+        size_t base_address = strToSize_t(var_base_map[local_a_map["vname"]]);
         int read_write = atoi(local_a_map["rw"].c_str());
 
-        fill_struct(read_write, -1, address, variable_index);
+        fill_trace_struct(read_write, -1, base_address, address, variable_index);
 
         //DEBUG:
         std::cout << local_a_map["vname"] << address << " " << read_write << std::endl;
