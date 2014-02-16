@@ -159,8 +159,6 @@ SS_MAP parse_line(const std::string &s){
     if(isVarInfo)
     {
         var_base_map[temp[1]] = temp[3];
-        //DEBUG:
-        //std::cout << "TEMP" << temp[1] << " " << temp[3] << std::endl;
         insertInCache = false;
     }
     else
@@ -173,9 +171,6 @@ SS_MAP parse_line(const std::string &s){
             (*mymap)["rw"] = READ_AND_WRITE;
         else
             (*mymap)["rw"] = UNKNOWN;
-
-        //DEBUG:
-        //std::cout << "Type " << temp[0] << " " << (*mymap)["rw"]  << std::endl;
 
         temp = split(temp[1], '+');
         trim(temp[0]);
@@ -239,8 +234,6 @@ int main(int argc, char* argv[]){
 
         if(var_map.count(access_map["vname"]) == 0){
             var_index.push_back(access_map["vname"]);
-            //DEBUG:
-            //std::cout << "INSERTING...." << access_map["vname"] << var_index.size() - 1 << std::endl;
             var_map[access_map["vname"]] = var_index.size() - 1;
         }
     }
@@ -252,9 +245,6 @@ int main(int argc, char* argv[]){
     for (int i = 0; i < var_index.size(); i++) {
         indigo__write_idx_c(var_index[i].c_str(), var_index[i].length());
     }
-
-    //DEBUG::
-    //std::cout << "VARBASEMAP" << var_base_map.size() <<  " " << var_base_map["a"] << " " << var_base_map["b"] << std::endl;
 
     /* 3. read_write line_number address var_idx */
     for (std::vector<SS_MAP>::const_iterator it = cached_accesses.begin(); it != cached_accesses.end(); ++it) {
