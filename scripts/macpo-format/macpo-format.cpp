@@ -38,31 +38,6 @@ std::string o_filename;
 int fd;
 bool insertInCache;
 
-/* Command line parser */
-/*
-   void parse_cli_options(int argc, char* argv[]){
-    if (argc < 5) { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-        std::cout << "Usage is -f <valgrind filename> -o <output filename>\n"; // Inform the user of how to use the program
-        std::cin.get();
-        exit(0);
-    } else {
-        char* myFile;
-        for (int i = 1; i < argc; i+=2) {
-            if (i + 1 != argc){
-//                if (strcmp(argv[i],"-f") == 0) {
-                if(argv[i] == "-f"){                
-                    m_filename = argv[i + 1];
-//                } else if (strcmp(argv[i],"-o") == 0) {
-                } else if(argv[i] == "-o"){                
-                    o_filename = argv[i + 1];
-                }
-            }
-        }
-    }
-}
-*/
-
-
  unsigned int ltox(std::string myhex){
      unsigned int x = strtoul(myhex.c_str(), NULL, 16);
      return x;
@@ -224,12 +199,18 @@ void printBaseHash(){
 int main(int argc, char* argv[]){
     //parse_cli_options(argc, argv);
 
-    m_filename = argv[2];
-    o_filename = argv[4];
+    if(argc < 3){
+        std::cerr << "Not enough parameters." << argc << std::endl;
+        std::cerr << "usage ./a.out <input filename> <output filename>" << argc << std::endl;
+
+        exit(0);
+    }
+    m_filename = argv[1];
+    o_filename = argv[2];
 
     std::vector<std::string> tokens;
 
-    std::ifstream m_stream("valout");
+    std::ifstream m_stream(m_filename.c_str());
 
     //to store variables for map
     std::set<std::string> variables;
