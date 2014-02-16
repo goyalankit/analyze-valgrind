@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <unordered_map>
+#include <tr1/unordered_map>
 #include <set>
 #include "macpo_record.h"
 #include <cstring>
@@ -17,8 +17,8 @@
 #define READ "1"
 #define WRITE "2"
 
-typedef std::unordered_map<std::string, std::string> SS_MAP; //string to string map
-typedef std::unordered_map<std::string, int> SI_MAP; //string to int map
+typedef std::tr1::unordered_map<std::string, std::string> SS_MAP; //string to string map
+typedef std::tr1::unordered_map<std::string, int> SI_MAP; //string to int map
 
 SI_MAP var_map;
 std::vector<std::string> var_index;
