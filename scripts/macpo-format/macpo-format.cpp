@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <tr1/unordered_map>
+#include <unordered_map>
 #include <set>
 #include "macpo_record.h"
 #include <cstring>
@@ -17,10 +17,11 @@
 #define READ "1"
 #define WRITE "2"
 
-typedef std::tr1::unordered_map<std::string, std::string> SS_MAP; //string to string map
-typedef std::tr1::unordered_map<std::string, int> SI_MAP; //string to int map
+typedef std::unordered_map<std::string, std::string> SS_MAP; //string to string map
+typedef std::unordered_map<std::string, int> SI_MAP; //string to int map
 
 SI_MAP var_map;
+std::vector<std::string> var_index;
 SS_MAP var_base_map;
 
 std::string m_filename;
@@ -173,10 +174,10 @@ SS_MAP parse_line(const std::string &s){
     }
     else
     {
-        if(temp[0] == "R ")
-            (*mymap)["rw"] = READ;
-        else if(temp[0] == "W ") 
-            (*mymap)["rw"] = WRITE;
+        if(temp[0] == "R ")        (*mymap)["rw"] = TYPE_READ;
+        else if(temp[0] == "W ")   (*mymap)["rw"] = TYPE_WRITE;
+        else if(temp[0] == "RW ")  (*mymap)["rw"] = TYPE_READ_AND_WRITE;
+        else                       (*mymap)["rw"] = TYPE_UNKNOWN;
 
         temp = split(temp[1], '+');
 
@@ -230,19 +231,20 @@ int main(int argc, char* argv[]){
 
         cached_accesses.push_back(access_map); //cache the access
 
-        int map_size = var_map.size();
-        var_map[access_map["vname"]] = var_ind; //add the variables to their map
-
-        if(var_map.size() > map_size) var_ind++;
-
+        if(var_map.count(access_map["vname"]) == 0){
+            var_index.push_back(access_map["vname"]);
+            //DEBUG:
+            //std::cout << "INSERTING...." << access_map["vname"] << var_index.size() - 1 << std::endl;
+            var_map[access_map["vname"]] = var_index.size() - 1;
+        }
     }
 
     /* 1. Write Metadata to the file */
     write_metadata();
 
     /* 2. write variable map */
-    for(SI_MAP::const_iterator it = var_map.begin(); it != var_map.end(); ++it){
-        indigo__write_idx_c((it->first).c_str(), (it->first).length());
+    for (int i = 0; i < var_index.size(); i++) {
+        indigo__write_idx_c(var_index[i].c_str(), var_index[i].length());
     }
 
     /* 3. read_write line_number address var_idx */
@@ -257,7 +259,7 @@ int main(int argc, char* argv[]){
         fill_trace_struct(read_write, -1, base_address, address, variable_index);
 
         //DEBUG:
-        std::cout << local_a_map["vname"] << address << " " << read_write << std::endl;
+        std::cout << variable_index << " " << address << " " << base_address << " " << read_write << " " << local_a_map["vname"] << std::endl;
     }
 
     /* 4. Terminator */
