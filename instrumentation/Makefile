@@ -1,8 +1,15 @@
 CXX := clang++
 LLVMCOMPONENTS := cppbackend
 RTTIFLAG := -fno-rtti
-#LLVMCONFIG := ~/DevelopmentKits/build/Debug+Asserts/bin/llvm-config
-LLVMCONFIG := /opt/apps/llvm/3.3/bin/llvm-config
+
+LLVMLIB := $(shell echo $(TACC_LLVM_LIB))
+
+ifeq ($(LLVMLIB), /opt/apps/llvm/3.3/lib)
+	LLVMCONFIG := /opt/apps/llvm/3.3/bin/llvm-config
+else
+	LLVMCONFIG := ~/DevelopmentKits/build/Debug+Asserts/bin/llvm-config
+endif
+
 
 CXXFLAGS := -I$(shell $(LLVMCONFIG) --src-root)/tools/clang/include -I$(shell $(LLVMCONFIG) --obj-root)/tools/clang/include $(shell $(LLVMCONFIG) --cxxflags) $(RTTIFLAG)
 LLVMLDFLAGS := $(shell $(LLVMCONFIG) --ldflags --libs $(LLVMCOMPONENTS))
