@@ -1,7 +1,8 @@
 CXX := clang++
 LLVMCOMPONENTS := cppbackend
 RTTIFLAG := -fno-rtti
-LLVMCONFIG := ~/DevelopmentKits/build/Debug+Asserts/bin/llvm-config
+#LLVMCONFIG := ~/DevelopmentKits/build/Debug+Asserts/bin/llvm-config
+LLVMCONFIG := /opt/apps/llvm/3.3/bin/llvm-config
 
 CXXFLAGS := -I$(shell $(LLVMCONFIG) --src-root)/tools/clang/include -I$(shell $(LLVMCONFIG) --obj-root)/tools/clang/include $(shell $(LLVMCONFIG) --cxxflags) $(RTTIFLAG)
 LLVMLDFLAGS := $(shell $(LLVMCONFIG) --ldflags --libs $(LLVMCOMPONENTS))

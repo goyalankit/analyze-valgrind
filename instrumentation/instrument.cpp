@@ -296,7 +296,7 @@ int main(int argc, char **argv)
 
     llvm::errs() << "Output to: " << outName << "\n";
     std::string OutErrorInfo;
-    llvm::raw_fd_ostream outFile(outName.c_str(), OutErrorInfo, llvm::sys::fs::F_None);
+    llvm::raw_fd_ostream outFile(outName.c_str(), OutErrorInfo, 0);
 
     if (OutErrorInfo.empty())
     {
