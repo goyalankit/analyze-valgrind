@@ -2,7 +2,7 @@
 
 require 'trollop'
 require 'pry'
-require "./parser_and_analyzer.rb"
+require "/work/02681/ankitg/workspace/analyze-valgrind/scripts/parser_and_analyzer.rb"
 
 opts = Trollop::options do
     opt :vf, "string --vf, give the filename for valgrind", :type => :string

@@ -92,7 +92,6 @@ File.readlines(ARGV[1]).each do |line|
             size = ts[2]
         end
 
-
         if((address.to_d >= v.base_address.to_d) && (address.to_d <= (v.base_address.to_d + 4 * (v.size.to_i - 1))))
             index_accessed = (address.to_d - v.base_address.to_d) / 4
             num_indexes = size.to_d / 4

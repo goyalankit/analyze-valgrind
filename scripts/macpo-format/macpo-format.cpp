@@ -74,12 +74,14 @@ static inline void fill_mem_struct(int read_write, int line_number, size_t p, in
     // or if the file-open failed, then return
     if (fd < 0)	return;
 
+    size_t address = (size_t) p;
+
     node_t node;
     node.type_message = MSG_MEM_INFO;
 
     node.mem_info.coreID = 1;
     node.mem_info.read_write = read_write;
-    node.mem_info.address = p;
+    node.mem_info.address = address;
     node.mem_info.var_idx = var_idx;
     node.mem_info.line_number = line_number;
     node.mem_info.type_size = type_size;
@@ -200,8 +202,19 @@ int main(int argc, char* argv[]){
 
         exit(0);
     }
+
+    bool FMemType = true;
+
     m_filename = argv[1];
     o_filename = argv[2];
+
+    if(argv[3] == "trace")
+        FMemType = false;
+
+    if(FMemType)
+        std::cout << "Generating binary with mem-info" << std::endl;
+    else
+        std::cout << "Generating binary with trace-info" << std::endl;
 
     std::vector<std::string> tokens;
 
@@ -255,11 +268,14 @@ int main(int argc, char* argv[]){
         size_t base_address = ltox(var_base_map[local_a_map["vname"]]);
 
         int read_write = atoi(local_a_map["rw"].c_str());
-
-        fill_trace_struct(read_write, -1, base_address, address, variable_index);
+        if(FMemType)
+            fill_mem_struct(read_write, -1, address, variable_index, 4); //TODO: get the size from trace
+        else
+            fill_trace_struct(read_write, -1, base_address, address, variable_index);
     }
 
     /* 4. Terminator */
+    std::cout << "Generated." << std::endl;
 
     return 0;
 }

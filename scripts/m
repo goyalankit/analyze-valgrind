@@ -1,6 +1,6 @@
 #!/bin/env sh
 
-macpo.sh --macpo:gen-trace=$1 $2 -o macpo
+macpo.sh --macpo:disable-sampling --macpo:gen-trace=$1 $2 -o macpo
 ./macpo
 macpo-analyze macpo.out &> macf.temp
 sed -i 1,2d macf.temp
