@@ -58,7 +58,7 @@ class MyRecursiveASTVisitor
         MyRecursiveASTVisitor(Rewriter &R) : Rewrite(R) { }
         void InstrumentDeclStmt(DeclStmt *s);
         bool VisitStmt(Stmt *s);
-        bool VisitCallExpr(CallExpr *E);
+//        bool VisitCallExpr(CallExpr *E);
 
         Rewriter &Rewrite;
 };
@@ -78,7 +78,7 @@ std::string printMethodDeclaration(std::string method_name, int type){
 }
 
 
-
+#if(0)
 bool MyRecursiveASTVisitor::VisitCallExpr (CallExpr *node) {
 
     if (node->getDirectCallee()) 
@@ -100,12 +100,11 @@ bool MyRecursiveASTVisitor::VisitCallExpr (CallExpr *node) {
 
     return true; 
 }
-
-
+#endif
 
 std::string printMethodName(std::string variable_name, const int size){
     std::stringstream method_name;
-    method_name << "\nprintf(\"varinfo:" << variable_name << ":"<< size << ":\%08lx\\n\"," << "(void *) &" << variable_name << ");";
+    method_name << "\nprintf(\"varinfo:" << variable_name << ":"<< size << ":\%08lx" <<  ":\%lu" << "\\n\"," << "(void *) &" << variable_name << ", sizeof(" << variable_name << "[0])" << ");";
     return method_name.str();
 }
 
