@@ -6,11 +6,17 @@ gen(){
     extension="${filename##*.}"
     filename="${filename%.*}"
  
-    echo "file name $1";
+    echo "compiling file and running valgrind tool...";
     v icrun $1;
     PID=`cat $filename.icc_val_out | awk '{print $1 }' | head -1 | sed "s/=//g"`
+    echo "File compiled. Trace generated. Process Id: $PID";
+    echo "Parsing the valgrind trace now...";
     pv bar_out.icc_val_out  gleipnir.$PID macpo > macpo.out.$PID
+    echo "Parsed the trace.";
+    echo "Converting to a format macpo-analyze can understand";
     val-to-macpo macpo.out.$PID vmacpo.out
+    echo "Generated vmacpo.out";
+    echo "try: macpo-analyze vmacpot.out"
 }
 
 clr(){

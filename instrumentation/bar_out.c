@@ -1,9 +1,9 @@
-#define L_AND(a, b) a && b
-#define L_OR(a, b) a || b
+#include "/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h"
 
 #include<stdio.h>
 
 void foo(int b[100], int a[100]){
+GL_GLOBAL_START_INSTR;
     int i;
     for(i=99; i > 0; i--){ 
         b[i] = 12;
@@ -12,6 +12,7 @@ void foo(int b[100], int a[100]){
     }
     b[3]  = 23;
     printf("hello %d",b[2]);
+GL_GLOBAL_STOP_INSTR;
 }
 
 int main(void){

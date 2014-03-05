@@ -305,8 +305,9 @@ int main(int argc, char **argv)
         compiler.getDiagnosticClient().EndSourceFile();
 
         // Output some #ifdefs
-        outFile << "#define L_AND(a, b) a && b\n";
-        outFile << "#define L_OR(a, b) a || b\n\n";
+        outFile << "//#include \"/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h\"\n";
+        outFile << "//GL_GLOBAL_START_INSTR;\n";
+        outFile << "//GL_GLOBAL_STOP_INSTR;\n\n";
 
         // Now output rewritten source code
         const RewriteBuffer *RewriteBuf =
