@@ -1,0 +1,27 @@
+#!/bin/env sh
+
+gen(){
+
+    filename=$(basename "$1")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+ 
+    echo "file name $1";
+    v icrun $1;
+    PID=`cat $filename.icc_val_out | awk '{print $1 }' | head -1 | sed "s/=//g"`
+    pv bar_out.icc_val_out  gleipnir.$PID macpo > macpo.out.$PID
+    val-to-macpo macpo.out.$PID vmacpo.out
+}
+
+clr(){
+    v clro;
+    rm -rf macpo.out*
+
+}
+
+case $1 in
+    clr) clr;;
+    gen) gen $2;;
+    help ) echo "Usage $0 {|<filename>|gen <filename>|clr}";;
+    *) echo "use gen <filename>";;
+esac
