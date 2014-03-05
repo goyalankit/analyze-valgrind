@@ -1,4 +1,3 @@
-
 Run bundle to get the ruby dependencies for command line parsing and debugging gems
 
 ```
@@ -7,7 +6,9 @@ bundle install
 
 ### Scripts
 
-# `m`
+---
+
+### `m`
 
 > This scripts takes a bar.c file and generates macpo trace from it. This is a simple bash script and takes a fixed number of arguments.
 
@@ -16,8 +17,9 @@ Syntax: `m foo bar.c`
 **foo**: Method to be instrumented.
 **bar.c**: Main source file
 
+---
 
-# `v`
+### `v`
 
 > This is a bash script. It can take several options.
 
@@ -45,9 +47,11 @@ Files Generated:
 `bar_val.icc_val_out` Contains the variable information. Stuff like variable names, their base addresses, type size.
 `gleipnir.$pid` Contains the actual trace from valgrind.
 
-# `pv` : Parse valgrind
+---
 
-### `pv bar_out.icc_val_out gleipnir.30221 macpo > macpo.out`
+### `pv` : Parse valgrind
+
+###### `pv bar_out.icc_val_out gleipnir.30221 macpo > macpo.out`
 Base file generate the binary that can be parsed by macpo analyze.
 
 Output Format:
@@ -61,7 +65,7 @@ W : a+ffeffdfdc : 4
 ```
 
 
-### `pv bar_out.icc_val_out gleipnir.30221 mlo > val_trace.out`
+###### `pv bar_out.icc_val_out gleipnir.30221 mlo > val_trace.out`
 To generate results like macpo-analyze command. Absolute access indexes
 
 Output Format:
@@ -74,13 +78,19 @@ W : b+6 : 4
 W : a+5 : 4
 ```
 
-# `macpo-format/val-to-mac` Convert into a binary that macpo-analyze can understand.
+---
 
-### `macpo-format/val-to-mac macpo.out macpo-out.out` 
+### `macpo-format/val-to-mac` 
+
+Convert into a binary that macpo-analyze can understand.
+
+###### `macpo-format/val-to-mac macpo.out macpo-out.out` 
+
 This will generate a binary that `macpo-analyze` script can understand. Note by default `mem-info` is added.
 
 
-### `macpo-format/val-to-mac macpo.out macpo-out.out trace`
+###### `macpo-format/val-to-mac macpo.out macpo-out.out trace`
+
 To generate trace info.
 
 
