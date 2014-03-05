@@ -19,6 +19,18 @@ Syntax: `m foo bar.c`
 
 ---
 
+### `master-valgrind`
+
+> Generates the macpo-analyze format from c source file. It compiles the code, runs the valgrind analysis, parses the valgrind output, creates a binary that macpo-analyze can understand. phew!
+
+`master-valgrind gen bar_out.c` //Note correctly instrument the code with pragmas.
+
+
+Clear the junk. Start from scratch.
+
+`master-valgrind clr`
+
+---
 ### `v`
 
 > This is a bash script. It can take several options.
