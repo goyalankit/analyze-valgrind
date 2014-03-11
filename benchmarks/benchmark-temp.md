@@ -2,6 +2,7 @@
 
 #### Valgrind trace analysis
 
+```
 [macpo] Analyzing logs created from the binary /work/0268 at Mon Mar 10 20:25:34 2014
 
 [macpo] Analyzing records for latency.
@@ -22,11 +23,12 @@ var: b: 0 (4000000 times) 1 (1000000 times) 127 (999949 times).
 var: c: 0 (3000000 times) 1 (990099 times) 127 (9900 times).
 
 [macpo] Analyzing records for vector stride values.
-
+```
 ---
 
 #### Macpo benchmarks
 
+```
 [macpo] Analyzing logs created from the binary /work/02681/ankitg/workspace/analyze-valgrind/benchmarks/macpo at Mon Mar 10 20:36:21 2014
 
 [macpo] Analyzing records for latency.
@@ -47,4 +49,4 @@ var: a: 0 (14 times).
 var: b: 1 (14 times).
 
 [macpo] Analyzing records for vector stride values.
-
+```
