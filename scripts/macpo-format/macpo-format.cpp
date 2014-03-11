@@ -31,6 +31,7 @@ using namespace boost::algorithm;
 SI_MAP var_map;
 std::vector<std::string> var_index;
 SS_MAP var_base_map;
+SI_MAP var_type_size_map;
 
 std::string m_filename;
 std::string o_filename;
@@ -161,6 +162,9 @@ SS_MAP parse_line(const std::string &s){
     if(isVarInfo)
     {
         var_base_map[temp[1]] = temp[3];
+
+//        std::cout << "Okay just testing " << temp[4] << std::endl;
+        var_type_size_map[temp[1]] = atoi(temp[4].c_str());
         insertInCache = false;
     }
     else
@@ -266,12 +270,13 @@ int main(int argc, char* argv[]){
         int variable_index = var_map[local_a_map["vname"]];
         size_t address = ltox(local_a_map["address"]);
         size_t base_address = ltox(var_base_map[local_a_map["vname"]]);
+        int type_size = var_type_size_map[local_a_map["vname"]];
 
         int read_write = atoi(local_a_map["rw"].c_str());
         if(FMemType)
-            fill_mem_struct(read_write, -1, address, variable_index, 4); //TODO: get the size from trace
+            fill_mem_struct(read_write, 0, address, variable_index, type_size); //TODO: get the size from trace
         else
-            fill_trace_struct(read_write, -1, base_address, address, variable_index);
+            fill_trace_struct(read_write, 0, base_address, address, variable_index);
     }
 
     /* 4. Terminator */
