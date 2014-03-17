@@ -30,7 +30,7 @@ File.readlines(ARGV[0]).each do |line|
     if line.include?("varinfo")
         s = line.split(":")
         variables << VarInfo.new(s[1], s[3], s[2])
-        puts line
+        puts line unless !ARGV[2].nil? && ARGV[2] == "mlo"
     end    
 end
 
@@ -52,7 +52,7 @@ def print_like_macpo type, name, index, size
     end
     #disabling size for now.
     #puts "#{mytype} : #{name}+#{index} : #{size}"
-    puts "#{mytype}:#{name}+#{index}"
+    puts "#{mytype}:#{name}:#{index}"
 end
 
 def print_for_macpo_generation type, name, index, size
