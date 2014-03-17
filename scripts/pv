@@ -50,7 +50,9 @@ def print_like_macpo type, name, index, size
     else
         mytype = type
     end
-    puts "#{mytype} : #{name}+#{index} : #{size}"
+    #disabling size for now.
+    #puts "#{mytype} : #{name}+#{index} : #{size}"
+    puts "#{mytype}:#{name}+#{index}"
 end
 
 def print_for_macpo_generation type, name, index, size

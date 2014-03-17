@@ -1,8 +1,6 @@
-#include "/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h"
 #include<stdio.h>
 
 void foo(int a[10], int b[10], int c[100]){
-    GL_GLOBAL_START_INSTR;
     int i;
     for(i=9; i > 0; i--){ 
         b[i] = 12;
@@ -15,16 +13,12 @@ void foo(int a[10], int b[10], int c[100]){
     }
 
     b[3]  = 23;
-    GL_GLOBAL_STOP_INSTR;
 }
 
 int main(void){
     int a[10];
-    printf("varinfo:a:10:%08lx\n",(void *) &a);
     int b[10];
-    int c[100]
-    printf("varinfo:b:10:%08lx\n",(void *) &b);
-    printf("varinfo:c:100:%08lx\n",(void *) &c);
+    int c[100];
     a[2] = 23;
     printf("%d", a[2]);
 

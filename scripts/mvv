@@ -7,7 +7,23 @@ require "/work/02681/ankitg/workspace/analyze-valgrind/scripts/parser_and_analyz
 opts = Trollop::options do
     opt :vf, "string --vf, give the filename for valgrind", :type => :string
     opt :mc, "string --mc, give the filename for macpo", :type => :string
+    opt :sortvf, "string --sortvf, give the filename for valgrind", :type => :string
+    opt :sortmc, "string --sortmc, give the filename for macpo", :type => :string
+    
 end
+
+if(opts[:sortvf_given])
+    valgrind = Valgrind.new(opts[:sortvf])
+    vresult = valgrind.parse_file
+    vresult.each { |k,v| puts v }
+    exit
+elsif(opts[:sortmc_given])
+    macpo = Macpo.new(opts[:sortmc])
+    mresult = macpo.parse_file
+    mresult.each { |k,v| puts v }
+    exit
+end
+
 
 Trollop::die :vf, "must be non-negative" unless opts[:vf_given]
 Trollop::die :mc, "must be non-negative" unless opts[:mc_given]
@@ -16,6 +32,8 @@ valgrind = Valgrind.new(opts[:vf])
 macpo = Macpo.new(opts[:mc])
 vresult = valgrind.parse_file
 mresult = macpo.parse_file
+
+
 
 analyzer = Analyzer.new(vresult, mresult)
 analyzer.analyze
