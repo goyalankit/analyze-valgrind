@@ -1,4 +1,4 @@
-#include "/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h"
+//#include "/work/02681/ankitg/workspace/valgrind/gleipnir/gleipnir.h"
 #include "trace.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,14 +7,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <assert.h>
+#include <omp.h>
 
 #define PG_SIZE 4096
 #define PG_START(_v) ((_v) & ~(unsigned long)(PG_SIZE-1))
 
 // has to be aligned to page. otherwise it will be done for you.
-#define ARRAY_ONE_BASE PG_START(0xffeffd000)
+#define ARRAY_ONE_BASE PG_START(0x10ffeffd000)
 #define ARRAY_ONE_SIZE (4096 * 2 * sizeof(int))
-#define ARRAY_TWO_BASE PG_START(PG_START(0xffeffd000) + ARRAY_ONE_SIZE + 1)
+#define ARRAY_TWO_BASE PG_START(PG_START(0x10ffeffd000) + ARRAY_ONE_SIZE + 1)
 
 #define BIT_MASK(a, b) (size_t)(((size_t) -1 >> ((sizeof(size_t)*8) \
                              - (b))) & ~((1U << (a)) - 1))
@@ -39,45 +40,57 @@ unsigned long * allocateArray(unsigned long addr, size_t size) {
         abort();
     }
 
-    printf("Base address of allocated variable: %li\n", m_map);
+    //printf("Base address of allocated variable: %li\n", m_map);
     assert((void *)m_map == (void *)addr);
 
     return m_map;
 }
 
-void printSetAndCacheLine(int **array) {
+void printSetAndCacheLine(int *array) {
+    //printf("sizeof int is  %d", sizeof(int));
     int i;
     for (i = 0; i < 4096; ++i) {
-        printf("Set: %d, CL: %li\n", address_to_set(&array[i]), CACHE_LINE((size_t)&array[i]));
+        if (address_to_set(&array[i]) == 0)
+            printf("Set: %d, CL: %li, ADD: %li\n", address_to_set(&array[i]), CACHE_LINE((size_t)&array[i]), &array[i]);
+                //printf("%li\n", &array[i]);
     }
 }
 
 void iterateToProduceTrace(int *array) {
-GL_GLOBAL_START_INSTR;
-    int i;
+//GL_GLOBAL_START_INSTR;
+int i, nthreads;
+#pragma omp parallel private(i)
     for (i = 0; i < 4096; ++i) {
         array[i] = i;
     }
-GL_GLOBAL_STOP_INSTR;
+//GL_GLOBAL_STOP_INSTR;
 }
 
 int main(int argc, char *argv[]) {
 
     unsigned long *addrOne    = allocateArray(ARRAY_ONE_BASE, ARRAY_ONE_SIZE);
-  //  unsigned long *addrSecond = allocateArray(ARRAY_TWO_BASE, ARRAY_ONE_SIZE);
+    unsigned long *addrSecond = allocateArray(ARRAY_TWO_BASE, ARRAY_ONE_SIZE);
 
-    //int *firstArray = (int *)addrOne;
-    //int *secondArray = (int *)addrSecond;
+    int *firstArray = (int *)addrOne;
+    int *secondArray = (int *)addrSecond;
 
-    //printf("varinfo:a:4096:%08lx:%lu\n",(void *) &firstArray[0], sizeof(firstArray[0]));
+    printf("varinfo:a:4096:%08lx:%lu\n",(void *) &firstArray[0], sizeof(firstArray[0]));
+    printf("varinfo:b:4096:%08lx:%lu\n",(void *) &secondArray[0], sizeof(secondArray[0]));
 
-//    iterateToProduceTrace(firstArray);
- //   iterateToProduceTrace(secondArray);
-    //printf("---First Array\n---");
+    iterateToProduceTrace(firstArray);
+    iterateToProduceTrace(secondArray);
+    iterateToProduceTrace(firstArray);
+    //printf("---First Array---\n");
+//    printSetAndCacheLine(firstArray);
+
+    //printf("---Second Array---\n");
+  //  printSetAndCacheLine(secondArray);
+
+    //printf("---First Array---\n");
     //printSetAndCacheLine(firstArray);
-
-    //printf("---Second Array\n---");
-    //printSetAndCacheLine(secondArray);
+    
+    //printf("---Second Array---\n");
+//    printSetAndCacheLine(secondArray);
 
     return 0;
 }
